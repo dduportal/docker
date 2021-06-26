@@ -53,7 +53,7 @@ stage('Build') {
                 //        }
                 //    }
                 //}
-                
+
                 // Let's always clean up the docker images at the very end
                 powershell(script: '& docker system prune --force --all', returnStatus: true)
             } else {
@@ -72,7 +72,7 @@ stage('Build') {
     }
 
     builds['linux'] = {
-        nodeWithTimeout('docker') {
+        nodeWithTimeout('docker && aws') {
             deleteDir()
 
             stage('Checkout') {
@@ -111,7 +111,7 @@ stage('Build') {
                             try {
                                 infra.withDockerCredentials {
                                   sh "make test-$label"
-                                }    
+                                }
                             } catch(err) {
                                 error("${err.toString()}")
                             } finally {
