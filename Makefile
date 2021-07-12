@@ -6,8 +6,8 @@ export BUILDKIT_PROGRESS=plain
 all: shellcheck build test
 
 DOCKERFILES ?= $(shell find . -not -path '**/windows/*' -not -path './tests/*' -type f -name Dockerfile)
-## Two tests per core available to the Docker Engine as most of the workload is network bound
-PARALLEL_JOBS ?= $$(($(shell docker run --rm alpine grep -c processor /proc/cpuinfo) * 2))
+## One test per core available to the Docker Engine as most of the workload is network
+PARALLEL_JOBS = $(shell docker run --rm alpine grep -c processor /proc/cpuinfo)
 TEST_SUITES ?= $(CURIDR)/tests
 # No additional flags by default
 BAKE_ADDITIONAL_FLAGS ?=
