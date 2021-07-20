@@ -8,7 +8,7 @@ export DOCKER_CLI_EXPERIMENTAL=enabled
 export BUILDKIT_PROGRESS=plain
 
 current_arch := $(shell uname -m)
-export ARCH ?= $(shell case $(current_arch) in (x86_64) echo "amd64" ;; (i386) echo "386";; (aarch64) echo "arm64" ;; (armv6*) echo "arm/v6";; (armv7*) echo "arm/v7";; (ppc64*|s390*|riscv*) echo $(current_arch);; (*) echo "UNKNOWN-CPU";; esac)
+export ARCH ?= $(shell case $(current_arch) in (x86_64) echo "amd64" ;; (i386) echo "386";; (aarch64|arm64) echo "arm64" ;; (armv6*) echo "arm/v6";; (armv7*) echo "arm/v7";; (ppc64*|s390*|riscv*) echo $(current_arch);; (*) echo "UNKNOWN-CPU";; esac)
 
 all: shellcheck build test
 
@@ -47,8 +47,11 @@ build-%: check-reqs
 	@$(call check_image,$*)
 	@set -x; $(bake_base_cli) --set '*.platform=linux/$(ARCH)' '$*'
 
+show:
+	@$(bake_base_cli) linux --print
+
 list: check-reqs
-	@set -x; $(bake_base_cli) linux --print | jq -r '.target | path(.. | select(.platforms[] | contains("linux/$(ARCH)"))?) | add'
+	@set -x; make --silent show | jq -r '.target | path(.. | select(.platforms[] | contains("linux/$(ARCH)"))?) | add'
 
 bats:
 	git clone https://github.com/bats-core/bats-core bats ;\
@@ -159,4 +162,4 @@ clean:
 	rm -rf tests/test_helper/bats-*; \
 	rm -rf bats
 
-.PHONY: shellcheck check-reqs build clean test list test-install-plugins
+.PHONY: shellcheck check-reqs build clean test list test-install-plugins show
