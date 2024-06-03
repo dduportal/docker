@@ -13,7 +13,7 @@ RUN jlink \
         --compress=2 \
         --output /javaruntime
 
-FROM almalinux:8.9
+FROM almalinux:8.10
 
 ENV LANG C.UTF-8
 
